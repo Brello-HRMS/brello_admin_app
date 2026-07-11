@@ -1,0 +1,61 @@
+export interface AuthUser {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  enterprise_id: string;
+  organization_id: string;
+}
+
+import { getCookie } from './cookieUtils';
+
+export const getAuthResponse = () => {
+  try {
+    const authStr = getCookie('auth_response');
+    if (authStr) {
+      return JSON.parse(authStr);
+    }
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to parse auth response:', error);
+  }
+  return null;
+};
+
+export const getAuthUser = (): AuthUser | null => {
+  const response = getAuthResponse();
+  return response?.data?.user || null;
+};
+
+export const getEnterpriseId = (): string | undefined => {
+  return getAuthUser()?.enterprise_id;
+};
+
+export const getOrganizationId = (): string | undefined => {
+  return getAuthUser()?.organization_id;
+};
+
+export const getAvailableApps = (): { id: string; name: string; priority: number }[] => {
+  const response = getAuthResponse();
+  return response?.data?.availableApps || [];
+};
+
+export const getCurrentAppId = (): string | undefined => {
+  const response = getAuthResponse();
+  return response?.data?.defaultAppId;
+};
+
+export const getCurrentAppName = (): string | undefined => {
+  const response = getAuthResponse();
+  const defaultAppId = response?.data?.defaultAppId;
+  if (!defaultAppId) return undefined;
+  const apps: { id: string; name: string }[] = response?.data?.availableApps || [];
+  return apps.find((a) => a.id === defaultAppId)?.name;
+};
+
+export const isAdminApp = (): boolean => getCurrentAppName() === 'ADMIN';
+
+export const isPlatformAdmin = (): boolean => {
+  const response = getAuthResponse();
+  return !!response?.data?.user?.is_platform_admin;
+};

@@ -1,0 +1,208 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import { AuthFormWrapper } from '../AuthFormWrapper/AuthFormWrapper';
+import { Button } from '../../../../components/ui/Button/Button';
+import elementsStyles from '../AuthFormWrapper/AuthFormElements.module.scss';
+import { useVerifyLoginOtp } from '../../api/useLogin';
+import { useResendOtp } from '../../api/useResendOtp';
+import { showToast } from '../../../ToastFeature/ShowToast';
+import { persistAuthResponse } from '../../../../utils/cookieUtils';
+
+import styles from './OtpForm.module.scss';
+
+import type { LoginResponse } from '../../api/authType';
+
+export const OtpForm: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email as string | undefined;
+
+  const {
+    mutate: verifyLoginOtp,
+    isPending: isLoginPending,
+    error: loginError,
+  } = useVerifyLoginOtp();
+
+  const { mutate: resendOtp, isPending: isResending, error: resendError } = useResendOtp();
+
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [timeLeft, setTimeLeft] = useState(29);
+
+  useEffect(() => {
+    if (!email) {
+      navigate('/auth/login', { replace: true });
+    }
+  }, [email, navigate]);
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+    const timerId = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timerId);
+  }, [timeLeft]);
+
+  const handleResend = () => {
+    if (!email) return;
+
+    resendOtp(
+      { email, purpose: 'LOGIN' },
+      {
+        onSuccess: () => {
+          setTimeLeft(29);
+          showToast('OTP resent successfully', 'success');
+        },
+      },
+    );
+  };
+
+  const handleChange = (element: HTMLInputElement, index: number) => {
+    if (isNaN(Number(element.value))) return false;
+
+    setOtp([...otp.map((d, idx) => (idx === index ? element.value : d))]);
+
+    // Focus next input
+    if (element.value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      // When pressing backspace on an empty field, focus the previous one
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text/plain').slice(0, 6).split('');
+    if (pastedData.some((char) => isNaN(Number(char)))) return;
+
+    const newOtp = [...otp];
+    pastedData.forEach((char, index) => {
+      if (index < 6) newOtp[index] = char;
+    });
+    setOtp(newOtp);
+
+    // Focus the next empty input or the last one
+    const nextEmptyIndex = newOtp.findIndex((val) => val === '');
+    const focusIndex = nextEmptyIndex === -1 ? 5 : nextEmptyIndex;
+    inputRefs.current[focusIndex]?.focus();
+  };
+
+  const submitOtp = (otpCode: string) => {
+    if (!email) return;
+    verifyLoginOtp(
+      { email, otp: otpCode, device_fingerprint: 'admin_panel' },
+      {
+        onSuccess: (data: LoginResponse) => {
+          const { user } = data.data;
+
+          if (!user.is_platform_admin) {
+            showToast('This account does not have platform admin access.', 'error');
+            return;
+          }
+
+          persistAuthResponse(data);
+          navigate('/dashboard');
+        },
+      },
+    );
+  };
+
+  useEffect(() => {
+    const otpCode = otp.join('');
+    if (otpCode.length === 6 && !otp.includes('')) {
+      submitOtp(otpCode);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp]);
+
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const otpCode = otp.join('');
+    if (otpCode.length === 6 && !otp.includes('')) {
+      submitOtp(otpCode);
+    }
+  };
+
+  return (
+    <div>
+      <AuthFormWrapper
+        title="Login to your account"
+        subtitle={`Enter your verification code sent to you at ${email || 'your email'}`}
+        onSubmit={handleSubmit}
+      >
+        <div className={styles.otpSection}>
+          <label className={elementsStyles.label}>
+            Enter OTP here<span className={elementsStyles.required}>*</span>
+          </label>
+
+          <div className={styles.otpInputContainer} onPaste={handlePaste}>
+            {otp.map((data, index) => {
+              return (
+                <React.Fragment key={index}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={1}
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
+                    }}
+                    value={data}
+                    onChange={(e) => handleChange(e.target, index)}
+                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    className={styles.otpInput}
+                    // placeholder="0"
+                  />
+                  {index === 2 && <span className={styles.separator}>-</span>}
+                </React.Fragment>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className={styles.actions}>
+          {(resendError || loginError) && (
+            <span
+              className={elementsStyles.error}
+              style={{ display: 'block', marginBottom: '16px' }}
+            >
+              {(loginError as Error)?.message ||
+                (resendError as Error)?.message ||
+                'OTP operation failed.'}
+            </span>
+          )}
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={otp.join('').length !== 6 || isLoginPending}
+          >
+            {isLoginPending ? 'Verifying...' : 'Continue'}
+          </Button>
+        </div>
+
+        <div className={styles.resendAction}>
+          {timeLeft > 0 ? (
+            <p className={styles.timerText}>
+              Resend code in 10:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}s
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={isResending}
+              className={styles.resendButton}
+            >
+              {isResending ? 'Resending...' : 'Resend code'}
+            </button>
+          )}
+        </div>
+      </AuthFormWrapper>
+    </div>
+  );
+};

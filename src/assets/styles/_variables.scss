@@ -1,0 +1,145 @@
+// Default Platform Theme
+:root {
+  // Brand Colors
+  --color-primary: #392a46;
+  --color-primary-hover: #61219b;
+  --color-primary-purple: #8300ff;
+  --color-primary-purple-hover: rgba(131, 0, 255, 0.02);
+  --color-primary-border: #7f56d9;
+  --color-primary-50: rgba(127, 86, 217, 0.1);
+  --color-primary-100: #ede9f8;
+  --color-primary-200: #d0c4f0;
+  --color-primary-700: #4a2d6f;
+  --color-secondary: #475467;
+
+  // Brand Loader specific (also used in Logo)
+  --brand: #6d28d9;
+  --brand-deep: #5b21b6;
+  --brand-mid: #8b5cf6;
+  --brand-light: #a78bfa;
+  --brand-pale: #c4b5fd;
+  --inactive: #e5e7eb;
+  --inactive-soft: #f3f4f6;
+  --tint: #f5f3ff;
+
+  // Brand Loader specific (also used in Logo)
+  --brand: #6d28d9;
+  --brand-deep: #5b21b6;
+  --brand-mid: #8b5cf6;
+  --brand-light: #a78bfa;
+  --brand-pale: #c4b5fd;
+  --inactive: #e5e7eb;
+  --inactive-soft: #f3f4f6;
+  --tint: #f5f3ff;
+
+  // Blue Badge Colors
+  --color-blue-50: #eff8ff;
+  --color-blue-100: #e0f2fe;
+  --color-blue-200: #b2ddff;
+  --color-blue-600: #1d4ed8;
+  --color-blue-700: #175cd3;
+
+  // Shadows
+  --color-shadow-light: rgba(0, 0, 0, 0.05);
+  --color-shadow-medium: rgba(0, 0, 0, 0.1);
+
+  // Base Colors
+  --color-white: #ffffff;
+  --color-white-transparent: rgba(255, 255, 255, 0.9);
+  --color-black: #141414;
+
+  // Semantic Colors (Success, Error, Gray)
+  --color-success-50: #ecfdf3;
+  --color-success-200: #abefc6;
+  --color-success-700: #067647;
+  --color-gray: #f3f4f6;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f2f4f7;
+  --color-gray-200: #eaecf0;
+  --color-gray-300: #d0d5dd;
+  --color-gray-500: #d0d5dd;
+  --color-gray-700: #344054;
+  --color-error: var(--color-error); // red/500
+  --color-error-50: #fef2f2; // red/50
+  --color-error-100: #fee4e2;
+  --color-error-200: #fecdca;
+  --color-error-700: #b42318;
+  --color-warning-50: #fffaeb;
+  --color-warning-200: #fedf89;
+  --color-warning-700: #b54708;
+
+  // Priority Badge Colors
+  // High / Urgent
+  --color-priority-high-bg: #fff1f0;
+  --color-priority-high-text: #cf1322;
+  --color-priority-high-border: #ffa39e;
+  // Medium
+  --color-priority-medium-bg: #fffbe6;
+  --color-priority-medium-text: #d48806;
+  --color-priority-medium-border: #ffe58f;
+  // Low
+  --color-priority-low-bg: #f0f5ff;
+  --color-priority-low-text: #1d39c4;
+  --color-priority-low-border: #adc6ff;
+
+  // Shadow for buttons
+  --shadow-button: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+  --shadow-button-error: 0px 1px 2px 0px rgba(16, 24, 40, 0.02);
+
+  // Text Colors
+  --color-text-primary: #0f0820;
+  --color-text-primary-500: #0f0820;
+  --color-text-secondary: #6b7280;
+  --color-text-header: var(--color-black);
+  --color-text-muted: #9ca3af;
+  --color-text-slate-500: #344054;
+  --color-icon-gray: #667085;
+
+  // Background & Borders
+  --color-background: #fafaf9;
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  --color-border-light: #f3f4f6;
+  --color-header-bottom-gradient: #c8c8d5;
+  --color-error: #dc3545;
+  --color-error-2: #dc2626;
+  --color-white: #ffffff;
+  --color-text-slate-500: #344054;
+
+  // Typography
+  --font-family-base: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-family-mono: 'DM Mono', monospace;
+  --font-size-base: 16px;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  // Spacing
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+
+  // Layout
+  --container-max-width: 1280px;
+  --header-height: 64px;
+
+  // Sidebar
+  --sidebar-width-expanded: 240px;
+  --sidebar-width-collapsed: 64px;
+
+  // Shadows
+  --shadow-card: 0px 2px 13px 0px #4754670d, 0px 12px 30px 0px #47546708;
+  --shadow-menu-selected: 0px 4px 14px 0px #47546714, 0px 12px 20px 0px #47546705;
+  --shadow-button: 0px 1px 2px 0px #1018280d;
+
+  // Border Radius
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+}
