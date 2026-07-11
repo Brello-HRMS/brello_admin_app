@@ -72,14 +72,14 @@ export const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
   const [isLocating, setIsLocating] = useState(false);
   const [flyTrigger, setFlyTrigger] = useState(0);
 
-  useEffect(() => {
-    if (value) {
-      setOfficeName(value.office_name ?? '');
-      setLat(value.latitude);
-      setLng(value.longitude);
-      setRadius(value.radius_meters ?? DEFAULT_RADIUS);
-    }
-  }, [value]);
+  const [prevValue, setPrevValue] = useState<GeoLocation | undefined>(value);
+  if (value && value !== prevValue) {
+    setPrevValue(value);
+    setOfficeName(value.office_name ?? '');
+    setLat(value.latitude);
+    setLng(value.longitude);
+    setRadius(value.radius_meters ?? DEFAULT_RADIUS);
+  }
 
   const hasPin = lat !== 0 || lng !== 0;
   const center: [number, number] = hasPin ? [lat, lng] : DEFAULT_CENTER;

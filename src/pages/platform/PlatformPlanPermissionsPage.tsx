@@ -128,11 +128,13 @@ const PlatformPlanPermissionsPage = () => {
   const { data: planAppsData } = usePlanApps(planId!);
   const { mutate: syncApps, isPending: isSyncingApps } = useSyncPlanApps(planId!);
 
-  useEffect(() => {
+  const [prevPlanAppsData, setPrevPlanAppsData] = useState(planAppsData);
+  if (planAppsData !== prevPlanAppsData) {
+    setPrevPlanAppsData(planAppsData);
     if (planAppsData) {
       setSelectedAppIds(new Set(planAppsData.map((a) => a.app_id)));
     }
-  }, [planAppsData]);
+  }
 
   const toggleExpanded = useCallback((moduleId: string) => {
     setExpandedModules((prev) => {
@@ -145,12 +147,34 @@ const PlatformPlanPermissionsPage = () => {
 
   const isLoading = pmLoading || pmaLoading;
 
-  useEffect(() => {
-    if (!allModules.length || !allActions.length || isLoading) return;
-    const initial = buildInitialState(allModules, allActions, planModules, planModuleActions);
-    setPermState(initial);
-    setOriginalState(initial);
-  }, [allModules, allActions, planModules, planModuleActions, isLoading]);
+  const [prevDeps, setPrevDeps] = useState({
+    allModules,
+    allActions,
+    planModules,
+    planModuleActions,
+    isLoading,
+  });
+
+  if (
+    allModules !== prevDeps.allModules ||
+    allActions !== prevDeps.allActions ||
+    planModules !== prevDeps.planModules ||
+    planModuleActions !== prevDeps.planModuleActions ||
+    isLoading !== prevDeps.isLoading
+  ) {
+    setPrevDeps({
+      allModules,
+      allActions,
+      planModules,
+      planModuleActions,
+      isLoading,
+    });
+    if (allModules.length && allActions.length && !isLoading) {
+      const initial = buildInitialState(allModules, allActions, planModules, planModuleActions);
+      setPermState(initial);
+      setOriginalState(initial);
+    }
+  }
 
   const childMap = useMemo(() => {
     const map = new Map<string, string[]>();
