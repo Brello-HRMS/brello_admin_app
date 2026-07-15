@@ -138,7 +138,7 @@ const PlatformPlansPage = () => {
                     enterpriseName={entName}
                     onEdit={handleEdit}
                     onDelete={setDeleteTarget}
-                    onConfigure={(p) => navigate(`/platform/plans/${p.id}/permissions`)}
+                    onConfigure={(p) => navigate(`/plans/${p.id}/permissions`)}
                   />
                 );
               })}
