@@ -5,39 +5,13 @@ import { DataTable, ListControls, NoDataFound, PageHeader } from '../../componen
 import { useDebounce } from '../../hooks/useDebounce';
 import { usePlansList } from '../../features/platform/plans/hooks';
 import { useLeadsList, useUpdateLeadStatus } from '../../features/platform/leads/hooks';
+import { LeadStatusSelect } from '../../features/platform/leads/components/LeadStatusSelect';
+import { ALL_STATUSES, STATUS_LABELS } from '../../features/platform/leads/constants';
 
 import styles from './PlatformLeadsPage.module.scss';
 
 import type { Lead, LeadStatus } from '../../features/platform/leads/types';
 import type { ColumnDef } from '@tanstack/react-table';
-
-const STATUS_LABELS: Record<LeadStatus, string> = {
-  NEW: 'New',
-  CONTACTED: 'Contacted',
-  DEMO_SCHEDULED: 'Demo Scheduled',
-  DEMO_COMPLETED: 'Demo Completed',
-  PROPOSAL_SENT: 'Proposal Sent',
-  NEGOTIATION: 'Negotiation',
-  CONTRACT_SENT: 'Contract Sent',
-  WON: 'Won',
-  LOST: 'Lost',
-  ON_HOLD: 'On Hold',
-};
-
-const STATUS_COLORS: Record<LeadStatus, { bg: string; color: string }> = {
-  NEW: { bg: '#eff6ff', color: '#2563eb' },
-  CONTACTED: { bg: '#f5f3ff', color: '#7c3aed' },
-  DEMO_SCHEDULED: { bg: '#eef2ff', color: '#4338ca' },
-  DEMO_COMPLETED: { bg: '#ecfeff', color: '#0891b2' },
-  PROPOSAL_SENT: { bg: '#fff7ed', color: '#ea580c' },
-  NEGOTIATION: { bg: '#fffbeb', color: '#d97706' },
-  CONTRACT_SENT: { bg: '#fefce8', color: '#ca8a04' },
-  WON: { bg: '#f0fdf4', color: '#16a34a' },
-  LOST: { bg: '#fef2f2', color: '#dc2626' },
-  ON_HOLD: { bg: '#f9fafb', color: '#6b7280' },
-};
-
-const ALL_STATUSES = Object.keys(STATUS_LABELS) as LeadStatus[];
 
 const PlatformLeadsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,16 +60,19 @@ const PlatformLeadsPage = () => {
       {
         id: 'lead',
         header: 'Lead',
+        size: 260,
         cell: ({ row }) => {
           const { first_name, last_name, email } = row.original;
           return (
             <div className={styles.leadCell}>
               <div className={styles.avatar}>{first_name[0]?.toUpperCase()}</div>
-              <div>
+              <div className={styles.leadInfo}>
                 <div className={styles.leadName}>
                   {first_name} {last_name}
                 </div>
-                <div className={styles.leadEmail}>{email}</div>
+                <div className={styles.leadEmail} title={email}>
+                  {email}
+                </div>
               </div>
             </div>
           );
@@ -104,6 +81,7 @@ const PlatformLeadsPage = () => {
       {
         accessorKey: 'phone',
         header: 'Phone',
+        size: 150,
         cell: ({ row }) => <span className={styles.mono}>{row.original.phone}</span>,
       },
       {
@@ -130,31 +108,13 @@ const PlatformLeadsPage = () => {
         accessorKey: 'lead_status',
         header: 'Status',
         size: 180,
-        cell: ({ row }) => {
-          const status = row.original.lead_status;
-          const colors = STATUS_COLORS[status];
-          return (
-            <select
-              className={styles.statusSelect}
-              style={{
-                background: colors.bg,
-                color: colors.color,
-                borderColor: `${colors.color}55`,
-              }}
-              value={status}
-              disabled={isUpdating}
-              onChange={(e) =>
-                updateStatus({ id: row.original.id, status: e.target.value as LeadStatus })
-              }
-            >
-              {ALL_STATUSES.map((s) => (
-                <option key={s} value={s}>
-                  {STATUS_LABELS[s]}
-                </option>
-              ))}
-            </select>
-          );
-        },
+        cell: ({ row }) => (
+          <LeadStatusSelect
+            value={row.original.lead_status}
+            disabled={isUpdating}
+            onChange={(status) => updateStatus({ id: row.original.id, status })}
+          />
+        ),
       },
       {
         accessorKey: 'is_verified',

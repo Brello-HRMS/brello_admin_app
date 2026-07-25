@@ -1,0 +1,122 @@
+.pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 8px 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: box-shadow 0.15s ease;
+
+  // dot + text share the status colour
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    opacity: 0.65;
+  }
+
+  // focus ring driven by the overlaid native <select>
+  &:focus-within {
+    box-shadow: 0 0 0 2px var(--color-primary-50);
+  }
+
+  &.disabled {
+    opacity: 0.55;
+
+    .nativeSelect {
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Invisible native select laid over the whole pill: entire chip is clickable,
+// the option list renders natively so it is never clipped by the table scroll.
+.nativeSelect {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: transparent;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+
+  option {
+    color: var(--color-text-primary);
+    background: var(--color-white);
+    font-weight: var(--font-weight-medium);
+  }
+}
+
+// ── Status palettes (design-token first, literals only where no token exists) ──
+
+.new {
+  background: var(--color-blue-50);
+  color: var(--color-blue-700);
+}
+
+.contacted {
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+}
+
+.demoScheduled {
+  background: var(--color-priority-low-bg);
+  color: var(--color-priority-low-text);
+}
+
+.demoCompleted {
+  background: #ecfeff;
+  color: #0e7490;
+}
+
+.proposalSent {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.negotiation {
+  background: var(--color-priority-medium-bg);
+  color: var(--color-priority-medium-text);
+}
+
+.contractSent {
+  background: #fefce8;
+  color: #a16207;
+}
+
+.won {
+  background: var(--color-success-50);
+  color: var(--color-success-700);
+}
+
+.lost {
+  background: var(--color-error-50);
+  color: var(--color-error-700);
+}
+
+.onHold {
+  background: var(--color-gray-100);
+  color: var(--color-text-secondary);
+}
